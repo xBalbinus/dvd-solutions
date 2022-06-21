@@ -38,7 +38,7 @@ contract UnstoppableLender is ReentrancyGuard {
         if (balanceBefore < borrowAmount) revert NotEnoughTokensInPool();
 
         // Ensured by the protocol via the `depositTokens` function
-        if (poolBalance != balanceBefore) revert AssertionViolated();
+        if (poolBalance != balanceBefore) revert AssertionViolated(); //@audit-issue poolBalance != balanceBefore if we send 1 token to contract.
 
         damnValuableToken.transfer(msg.sender, borrowAmount);
 

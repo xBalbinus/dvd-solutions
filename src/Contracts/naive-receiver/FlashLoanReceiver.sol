@@ -37,6 +37,6 @@ contract FlashLoanReceiver {
     // Internal function where the funds received are used
     function _executeActionDuringFlashLoan() internal {}
 
-    // Allow deposits of ETH
+    //@audit Allow deposits of ETH
     receive() external payable {}
 }

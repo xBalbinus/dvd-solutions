@@ -18,6 +18,7 @@ contract NaiveReceiverLenderPool is ReentrancyGuard {
     error FlashLoanHasNotBeenPaidBack();
 
     function fixedFee() external pure returns (uint256) {
+        //@audit-info clear.
         return FIXED_FEE;
     }
 
@@ -25,9 +26,9 @@ contract NaiveReceiverLenderPool is ReentrancyGuard {
         external
         nonReentrant
     {
-        uint256 balanceBefore = address(this).balance;
+        uint256 balanceBefore = address(this).balance; //@audit
         if (balanceBefore < borrowAmount) revert NotEnoughETHInPool();
-        if (!borrower.isContract()) revert BorrowerMustBeADeployedContract();
+        if (!borrower.isContract()) revert BorrowerMustBeADeployedContract(); //@audit-issue ANYONE can call "flashloan" for any borrower's funds.
 
         // Transfer ETH and handle control to receiver
         borrower.functionCallWithValue(
@@ -39,6 +40,6 @@ contract NaiveReceiverLenderPool is ReentrancyGuard {
             revert FlashLoanHasNotBeenPaidBack();
     }
 
-    // Allow deposits of ETH
+    //@audit Allow deposits of ETH
     receive() external payable {}
 }
